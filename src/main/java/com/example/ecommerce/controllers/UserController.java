@@ -8,13 +8,14 @@ import static com.example.ecommerce.constants.StringConstants.UPDATE_REQUEST;
 
 import com.example.ecommerce.models.User;
 import com.example.ecommerce.services.UserService;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.Date;
 import java.util.List;
-import javax.validation.Valid;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * methods to manipulate User Objects/Entities. It handles requests about User information, which
  * the user can send via URL.
  */
-@Api(value = "User Controller")
+@Tag(name = "User Controller", description = "User management API")
 @RestController
 @RequestMapping(CONTEXT_USERS)
 public class UserController {

@@ -1,6 +1,6 @@
 package com.example.ecommerce.validators;
 
-import javax.validation.Constraint;
+import jakarta.validation.Constraint;
 
 /**
  * The State interface contains the message for failed validation on the nested 'State' property of

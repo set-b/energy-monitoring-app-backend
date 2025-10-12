@@ -8,13 +8,14 @@ import static com.example.ecommerce.constants.StringConstants.UPDATE_REQUEST;
 
 import com.example.ecommerce.models.Customer;
 import com.example.ecommerce.services.CustomerService;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.Date;
 import java.util.List;
-import javax.validation.Valid;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * uses these methods to manipulate Customer Objects/Entities. It handles requests about Customer
  * information, which the user can send via URL.
  */
-@Api(value = "Customer Controller")
+@Tag(name = "Customer Controller", description = "Customer management API")
 @RestController
 @RequestMapping(CONTEXT_CUSTOMERS)
 public class CustomerController {

@@ -2,8 +2,8 @@ package com.example.ecommerce.validators;
 
 import java.util.Arrays;
 import java.util.List;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * StateValidator contains the validation logic used for the custom validator annotation, State.
