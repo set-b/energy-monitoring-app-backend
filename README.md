@@ -28,9 +28,10 @@ section.
 
 ## Viewing the database
 
-The data source provider for this application is MySQL. Login with MySQL credentials using the
-commandline,
-or start the MySQL Workbench UI to view the Customer, Order, User, Product, and Item entities.
+The application is currently configured to use a local in-memory H2 database for the purposes of quick local testing and demonstration.
+
+The original data source provider for this application is MySQL. If you wish to run the application connected to a MySQL database instead of a local in-memory database, uncomment the lines for the MySQL database in the YAML file, and input your MySQL credentials, including the username and password fields, as well as the url of your database host. Ensure that the the H2 configurations are also commented out or removed prior to starting the application. You may also use the
+command line, or start the MySQL Workbench UI to view the Customer, Order, User, Product, and Item entities.
 
 ## Overview of Classes
 
@@ -105,11 +106,7 @@ optimize the imports of subdirectories, as well.
 
 ### Helpful Links
 
-Postman Collection Link: <https://www.getpostman.com/collections/de4186a0431ccfa7aaaa>
+Swagger UI: <http://localhost:8080/swagger-ui/index.html>
 
-Swagger UI Link: <http://localhost:8080/swagger-ui/index.html>
-
-LinkedIn: <https://www.linkedin.com/in/brandyn-tse-085872166>
-
-Github: <https://github.com/battafurai-gunmetaru>
+Github: <https://github.com/set-b>
 
