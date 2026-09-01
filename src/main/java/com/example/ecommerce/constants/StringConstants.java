@@ -8,6 +8,7 @@ public class StringConstants {
 
   public static final String REQUIRED_FIELD = "is a required field";
   public static final String QUERY_REQUEST = "Query request received for ";
+  public static final String GET_REQUEST_ENERGY = "Get request received for ";
   public static final String NOT_FOUND = "Could not locate resource: ";
   public static final String VALIDATION_ERROR = "Validation error";
   public static final String UPDATE_REQUEST = "Put request received for ";
@@ -16,6 +17,8 @@ public class StringConstants {
   public static final String BAD_DATA = "Bad data";
   public static final String SERVER_ERROR = "Server error";
   public static final String UNEXPECTED_ERROR = "Unexpected server error";
+
+  public static final String ENERGY_DATA = "all energy data";
 
   public static final String CONFLICT = "Conflict";
 

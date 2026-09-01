@@ -10,12 +10,8 @@ import com.example.ecommerce.models.Item;
 import com.example.ecommerce.models.Order;
 import com.example.ecommerce.models.Product;
 import com.example.ecommerce.models.User;
-import com.example.ecommerce.repositories.CustomerRepository;
-import com.example.ecommerce.repositories.GreetingRepository;
-import com.example.ecommerce.repositories.ItemRepository;
-import com.example.ecommerce.repositories.OrderRepository;
-import com.example.ecommerce.repositories.ProductRepository;
-import com.example.ecommerce.repositories.UserRepository;
+import com.example.ecommerce.repositories.*;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +42,8 @@ public class DataLoader implements CommandLineRunner {
   private ProductRepository productRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private EnergyMonitoringRepository energyMonitoringRepository;
 
   private Greeting greeting;
   private Greeting greetingTwo;
@@ -89,6 +87,7 @@ public class DataLoader implements CommandLineRunner {
     loadItems();
     loadProducts();
     loadUsers();
+    loadEnergyMonitoringData();
   }
 
   public Date createDate(String dateValue) {
@@ -182,5 +181,10 @@ public class DataLoader implements CommandLineRunner {
             "supersecretpassword1!"));
   }
 
+  /**
+   * this loads the CSV file to the EnergyMonitoringRepository to be saved in the database
+   */
+  private void loadEnergyMonitoringData() {
 
+  }
 }
