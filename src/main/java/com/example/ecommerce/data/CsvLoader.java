@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * This class is used to load and parse CSV data to be saved in the EnergyMonitoringRepository
+ * loads at runtime
  */
 @Component
 public class CsvLoader {

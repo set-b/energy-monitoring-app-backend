@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This Class contains methods from the EnergyMonitoringService interface.
@@ -31,24 +32,13 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
     @Override
     public String getAllEnergyData() {
         try {
-
+            String data = energyMonitoringRepository.findAll().stream().map(
+                    m -> m.getContent()
+            ).collect(Collectors.joining());
+            return data;
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ServiceUnavailable(); // change error later to relevant TODO
         }
-//        try {
-//            if (customer.isEmpty()) {
-//                List<Customer> customers = customerRepository.findAll();
-//                customers.sort(Comparator.comparing(Customer::getId));
-//                return customers;
-//            } else {
-//                Example<Customer> customerExample = Example.of(customer);
-//                return customerRepository.findAll(customerExample);
-//            }
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            throw new ServiceUnavailable(e);
-//        }
-        return "";
     }
 }

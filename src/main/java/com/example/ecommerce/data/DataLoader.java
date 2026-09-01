@@ -3,13 +3,7 @@ package com.example.ecommerce.data;
 import static com.example.ecommerce.constants.StringConstants.ADMIN;
 import static com.example.ecommerce.constants.StringConstants.EMPLOYEE;
 
-import com.example.ecommerce.models.Address;
-import com.example.ecommerce.models.Customer;
-import com.example.ecommerce.models.Greeting;
-import com.example.ecommerce.models.Item;
-import com.example.ecommerce.models.Order;
-import com.example.ecommerce.models.Product;
-import com.example.ecommerce.models.User;
+import com.example.ecommerce.models.*;
 import com.example.ecommerce.repositories.*;
 
 import java.math.BigDecimal;
@@ -79,6 +73,9 @@ public class DataLoader implements CommandLineRunner {
   private Address addressThree = new Address("124 Conch Street", "Bikini Bottom", "CA", "94103");
   private Address addressFour = new Address("30 Pixie way", "Dimmsdale", "CA", "90210");
 
+
+  private EnergyMonitoringData data;
+
   @Override
   public void run(String... args) throws Exception {
     loadGreetings();
@@ -87,7 +84,7 @@ public class DataLoader implements CommandLineRunner {
     loadItems();
     loadProducts();
     loadUsers();
-    loadEnergyMonitoringData();
+//    loadEnergyMonitoringData();
   }
 
   public Date createDate(String dateValue) {
@@ -181,10 +178,10 @@ public class DataLoader implements CommandLineRunner {
             "supersecretpassword1!"));
   }
 
-  /**
-   * this loads the CSV file to the EnergyMonitoringRepository to be saved in the database
-   */
-  private void loadEnergyMonitoringData() {
-
-  }
+//  /**
+//   * this loads the CSV file to the EnergyMonitoringRepository to be saved in the database
+//   */
+//  private void loadEnergyMonitoringData() {
+//      data = EnergyMonitoringRepository
+//  }
 }
