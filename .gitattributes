@@ -1,0 +1,2 @@
+src/main/resources/resident_mock.csv filter=lfs diff=lfs merge=lfs -text
+data/testdb.mv.db filter=lfs diff=lfs merge=lfs -text

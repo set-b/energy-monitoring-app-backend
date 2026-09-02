@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.ecommerce.data.DataLoader;
 import com.example.ecommerce.exceptions.BadDataResponse;
 import com.example.ecommerce.exceptions.ResourceNotFound;
 import com.example.ecommerce.exceptions.ServiceUnavailable;

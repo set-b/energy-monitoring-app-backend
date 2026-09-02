@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -73,20 +74,20 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
     // TODO create string context for consumption or production
     @Override
     public double getTotalConsumptionForToday() {
-        List<EnergyMonitoringData> todaysEnergyData = getEnergyDataForToday();
-        return todaysEnergyData.stream()
-                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("consumption"))
-                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
-                .sum();
+        Instant now = Instant.now();
+        Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return energyMonitoringRepository.sumPower("POW", "consumption", startOfToday, now);
     }
 
     @Override
     public double getTotalProductionForToday() {
-        List<EnergyMonitoringData> todaysEnergyData = getEnergyDataForToday();
-        return todaysEnergyData.stream()
-                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("production"))
-                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
-                .sum();
+        Instant now = Instant.now();
+        Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return energyMonitoringRepository.sumPower("POW", "generation", startOfToday, now);
     }
 
     @Override
