@@ -12,7 +12,10 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This Class contains methods from the EnergyMonitoringService interface.
@@ -92,6 +95,45 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
         return energyMonitoringRepository.sumPower("POW", "generation", startOfToday, now);
     }
 
+    private static final int EARLIEST_HOUR = 7;
+    private static final int LATEST_HOUR = 22;
+
+    @Override
+    public int getNextBestTimeHours() {
+        Instant now = Instant.now();
+        Instant windowStart = now.minus(60, ChronoUnit.DAYS);
+
+        List<Object[]> rows = energyMonitoringRepository.avgSupplyByHour(windowStart, now);
+
+        Map<Integer, Double> avgByHour = new HashMap<>();
+        for (Object[] row : rows) {
+            int hour = ((Number) row[0]).intValue();
+            double avgSupply = ((Number) row[1]).doubleValue();
+            avgByHour.put(hour, avgSupply);
+        }
+
+        int currentHour = now.atZone(ZoneOffset.UTC).getHour();
+
+        int bestOffset = -1;
+        double bestSupply = Double.POSITIVE_INFINITY;   // most negative = most surplus
+
+        // scan the next 24 hours starting now, wrapping past midnight
+        for (int offset = 0; offset < 24; offset++) {
+            int hour = (currentHour + offset) % 24;
+            if (hour < EARLIEST_HOUR || hour > LATEST_HOUR) continue;  // skip overnight
+
+            Double avg = avgByHour.get(hour);
+            if (avg == null) continue;
+
+            if (avg < bestSupply) {
+                bestSupply = avg;
+                bestOffset = offset;   // hours from now
+            }
+        }
+
+        return bestOffset;   // 0..47 realistically; -1 only if no data at all
+    }
+
     @Override
     public double getTotalProductionForResident() {
         return 0;
@@ -99,8 +141,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
 
     @Override
     public double getTotalConsumptionForResident() {
-        return 0;
+    return 0;
     }
-
-
 }

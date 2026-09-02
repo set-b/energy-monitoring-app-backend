@@ -18,6 +18,8 @@ public interface EnergyMonitoringService {
     double getTotalConsumptionForToday();
     double getTotalProductionForToday();
 
+    int getNextBestTimeHours();
+
     double getTotalProductionForResident();
 
     double getTotalConsumptionForResident();
