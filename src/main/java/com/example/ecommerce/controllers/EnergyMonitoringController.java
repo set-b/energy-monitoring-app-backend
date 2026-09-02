@@ -78,4 +78,16 @@ public class EnergyMonitoringController {
         return new ResponseEntity<>(energyMonitoringService.getTotalProductionForToday(), HttpStatus.OK);
     }
 
+    @GetMapping("/today/next-best-time")
+    @Operation(summary = "Get Total Energy Production Data for today",
+            description = "Get all energy monitoring data for today's production",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<Integer> getNextBestTimeToUseEnergy() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getNextBestTimeHours(), HttpStatus.OK);
+    }
+
 }

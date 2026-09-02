@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This Class contains methods from the EnergyMonitoringService interface.
@@ -43,26 +45,12 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
     @Override
     public List<EnergyMonitoringData> getEnergyDataForToday() {
         try {
-//            LocalDate today = LocalDate.now(ZoneOffset.UTC);
+            LocalDate today = LocalDate.now(ZoneOffset.UTC);
 
-//            Instant startOfDay = today.atStartOfDay(ZoneOffset.UTC).toInstant();
+            Instant startOfDay = today.atStartOfDay(ZoneOffset.UTC).toInstant();
 
 
-//            Instant currentTime = Instant.now();
-
-            String startStr = "2026-03-29 00:00:00+00:00";
-            String currentStr = "2026-03-29 23:05:00+00:00";
-
-            // 1. Define the pattern matching your exact string layout
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
-
-            // 2. Parse into a ZonedDateTime first (handles the offset safely)
-            ZonedDateTime zonedDateTimeStart = ZonedDateTime.parse(startStr, formatter);
-            ZonedDateTime zonedDateTimeCurrent = ZonedDateTime.parse(currentStr, formatter);
-
-            // 3. Convert directly to an Instant
-            Instant startOfDay = zonedDateTimeStart.toInstant();
-            Instant currentTime = zonedDateTimeCurrent.toInstant();
+            Instant currentTime = Instant.now();
 
              return energyMonitoringRepository.findAllByTimestampBetween(startOfDay, currentTime);
         } catch (Exception e){
@@ -70,6 +58,8 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
             throw new ServiceUnavailable();
         }
     }
+
+
 
     // TODO create string context for consumption or production
     @Override
@@ -90,6 +80,45 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
         return energyMonitoringRepository.sumPower("POW", "generation", startOfToday, now);
     }
 
+    private static final int EARLIEST_HOUR = 7;
+    private static final int LATEST_HOUR = 22;
+
+    @Override
+    public int getNextBestTimeHours() {
+        Instant now = Instant.now();
+        Instant windowStart = now.minus(60, ChronoUnit.DAYS);
+
+        List<Object[]> rows = energyMonitoringRepository.avgSupplyByHour(windowStart, now);
+
+        Map<Integer, Double> avgByHour = new HashMap<>();
+        for (Object[] row : rows) {
+            int hour = ((Number) row[0]).intValue();
+            double avgSupply = ((Number) row[1]).doubleValue();
+            avgByHour.put(hour, avgSupply);
+        }
+
+        int currentHour = now.atZone(ZoneOffset.UTC).getHour();
+
+        int bestOffset = -1;
+        double bestSupply = Double.POSITIVE_INFINITY;   // most negative = most surplus
+
+        // scan the next 24 hours starting now, wrapping past midnight
+        for (int offset = 0; offset < 24; offset++) {
+            int hour = (currentHour + offset) % 24;
+            if (hour < EARLIEST_HOUR || hour > LATEST_HOUR) continue;  // skip overnight
+
+            Double avg = avgByHour.get(hour);
+            if (avg == null) continue;
+
+            if (avg < bestSupply) {
+                bestSupply = avg;
+                bestOffset = offset;   // hours from now
+            }
+        }
+
+        return bestOffset;   // 0..47 realistically; -1 only if no data at all
+    }
+
     @Override
     public double getTotalProductionForResident() {
         return 0;
@@ -97,8 +126,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
 
     @Override
     public double getTotalConsumptionForResident() {
-        return 0;
+    return 0;
     }
-
-
 }

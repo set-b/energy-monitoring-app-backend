@@ -29,4 +29,18 @@ public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitori
                     @Param("category") String category,
                     @Param("start") Instant start,
                     @Param("now") Instant now);
+
+    @Query("""
+    SELECT HOUR(e.timestamp) AS hourOfDay,
+           AVG(e.value) AS avgSupplyPower
+    FROM EnergyMonitoringData e
+    WHERE e.field = 'POW'
+      AND e.commodityCategory = 'supply'
+      AND e.timestamp >= :windowStart
+      AND e.timestamp <= :windowEnd
+    GROUP BY HOUR(e.timestamp)
+    ORDER BY hourOfDay
+    """)
+    List<Object[]> avgSupplyByHour(@Param("windowStart") Instant windowStart,
+                                   @Param("windowEnd") Instant windowEnd);
 }
