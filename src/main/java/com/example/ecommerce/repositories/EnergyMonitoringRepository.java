@@ -1,6 +1,5 @@
 package com.example.ecommerce.repositories;
 
-import com.example.ecommerce.models.Customer;
 import com.example.ecommerce.models.EnergyMonitoringData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,14 +17,20 @@ import java.util.List;
 public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitoringData, Long> {
     List<EnergyMonitoringData> findAllByTimestampBetween(Instant startOfDay, Instant endOfWindow);
 
-    List<EnergyMonitoringData> findAllByTimestampLessThan(Instant todayDate);
+    @Query("""
+        SELECT COALESCE(SUM(e.value), 0)
+        FROM EnergyMonitoringData e
+        WHERE e.field = :field
+          AND e.commodityCategory = :category
+          AND e.timestamp >= :start
+          AND e.timestamp <= :now
+        """)
+    double sumPower(@Param("field") String field,
+                    @Param("category") String category,
+                    @Param("start") Instant start,
+                    @Param("now") Instant now);
 
-//    List<EnergyMonitoringData>
-//    findAllByTimestampLessThanAndFieldAndCommodityType(
-//            Instant timestamp,
-//            String field,
-//            String commodityType
-//    );
+    List<EnergyMonitoringData> findAllByTimestampLessThan(Instant todayDate);
 
 
     @Query("""

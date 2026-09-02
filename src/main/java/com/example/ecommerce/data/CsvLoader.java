@@ -24,7 +24,11 @@ public class CsvLoader {
 
     @PostConstruct
     public void load() throws IOException {
-        ClassPathResource resource = new ClassPathResource("resident.csv");
+        if (energyMonitoringRepository.count() > 0) {
+            System.out.println("Database already populated. Skipping CSV data load.");
+            return;
+        }
+        ClassPathResource resource = new ClassPathResource("resident_mock.csv");
         try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
 
             List<EnergyMonitoringData> data = new CsvToBeanBuilder<EnergyMonitoringData>(reader)

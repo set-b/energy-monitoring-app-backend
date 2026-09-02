@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -75,20 +76,20 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
     // TODO create string context for consumption or production
     @Override
     public double getTotalConsumptionForToday() {
-        List<EnergyMonitoringData> todaysEnergyConsumptionData = getEnergyDataForToday();
-        return todaysEnergyConsumptionData.stream()
-                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("consumption"))
-                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
-                .sum();
+        Instant now = Instant.now();
+        Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return energyMonitoringRepository.sumPower("POW", "consumption", startOfToday, now);
     }
 
     @Override
     public double getTotalProductionForToday() {
-        List<EnergyMonitoringData> todaysEnergyProductionData = getEnergyDataForToday();
-        return todaysEnergyProductionData.stream()
-                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("production"))
-                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
-                .sum();
+        Instant now = Instant.now();
+        Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return energyMonitoringRepository.sumPower("POW", "generation", startOfToday, now);
     }
 
 
@@ -160,14 +161,12 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
      * - conditional to call helper function
      * - if CTYPEC == generation then add up the _value fields
      */
-    @Override
+
     public double getTotalGenerationForResident() {
         return -getTotalByDataSourceAndCommodityCategories(
                 EnergyDataSource.RESIDENT,
                 List.of("generation")
         );
-    }
-
 
 //    //TODO this should be for CommunityHouse - so we should have something to distinct it from resident
 
@@ -182,7 +181,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
      * NOTEBOOK INFORMATION ->
      * -- from last reading surplus/deficit in energy production - neighborhood (this from notebook)
      */
-    @Override
     public double getDeficitAndSurplusOfTheNeighborhood() {
         double signedNetEnergy =
                 getTotalByDataSourceAndCommodityCategories(
@@ -191,7 +189,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
                 );
 
         return -signedNetEnergy;
-    }
 
     /*--------------------------------------------------------------------------------------------------------*/
 

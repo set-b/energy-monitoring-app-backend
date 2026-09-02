@@ -1,29 +1,17 @@
-logging:
-  file:
-    name: src/main/resources/eCommerce.log
-# For local testing and demo purposes, the MYSQL database configuration has been temporarily disabled,
-# and a local in-memory database has been configured
 spring:
   jpa:
-    # database: MYSQL
-    database: H2
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
-  dataSource:
-    #    platform: mysql
-    #    url: jdbc:mysql://localhost:3306/mysql
-    #    username: root
-    #    password: root
-    #    driverClassName:
-    platform: h2
-    url: jdbc:h2:mem:testdb
+      ddl-auto: update
+  datasource:                                              # lowercase, one word
+    url: jdbc:h2:file:./data/testdb;AUTO_SERVER=TRUE
     username: sa
     password:
     driver-class-name: org.h2.Driver
   h2:
     console:
-      enabled: true # you can access the console through this link: http://localhost:8080/h2-console
+      enabled: true
   mvc:
     pathMatch:
       matching-strategy: ant-path-matcher
