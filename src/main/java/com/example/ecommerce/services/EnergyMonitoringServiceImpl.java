@@ -123,7 +123,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
 
 
-    /*--------------------------------------------------------------------------------------------------------*/
 
     /**
      * Calculates the total value for the requested data source and commodity categories.
@@ -220,7 +219,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
         return -signedNetEnergy;
 
-        /*--------------------------------------------------------------------------------------------------------*/
 
 
     }
