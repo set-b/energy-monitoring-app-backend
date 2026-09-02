@@ -87,7 +87,7 @@ public class EnergyMonitoringController {
     @Operation(summary = "Get Total Energy Consumption Data for resident",
             description = "Get all energy monitoring data for resident's consumption",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+                    @ApiResponse(responseCode = "200", description = "Total Energy consumption data")
             })
     public ResponseEntity<Double> getResidentTotalConsumption() {
         logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
@@ -99,12 +99,26 @@ public class EnergyMonitoringController {
     @Operation(summary = "Get Total Energy Production Data for resident",
             description = "Get all energy monitoring data for resident's production",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+                    @ApiResponse(responseCode = "200", description = "Total Energy production data ")
             })
-    public ResponseEntity<Double> getTotalProductionForResident() {
+    public ResponseEntity<Double> getTotalGenerationForResident() {
         logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
 
-        return new ResponseEntity<>(energyMonitoringService.getTotalProductionForResident(), HttpStatus.OK);
+        return new ResponseEntity<>(energyMonitoringService.getTotalGenerationForResident(), HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("/neighborhood/subtract/overall")
+    @Operation(summary = "Subtract production and consumption Data for neighborhood",
+            description = "Subtract data for the neighborhood ",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "from last reading surplus/deficit in energy production - neighborhood")
+            })
+    public ResponseEntity<Double> getDeficitAndSurplusOfTheNeighborhood() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getDeficitAndSurplusOfTheNeighborhood(), HttpStatus.OK);
     }
 
 }
