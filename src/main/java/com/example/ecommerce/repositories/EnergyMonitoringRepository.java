@@ -9,57 +9,59 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * This repository is used for saving CSV file as a String. **This will be changed in the future**
- * Long is the {id} of the CSV file being loaded
- */
 @Repository
 public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitoringData, Long> {
-    List<EnergyMonitoringData> findAllByTimestampBetween(Instant startOfDay, Instant endOfWindow);
+
+    // Derived query: add Site to the method name and a parameter.
+    List<EnergyMonitoringData> findAllBySiteAndTimestampBetween(
+            String site, Instant startOfDay, Instant endOfWindow);
 
     @Query("""
         SELECT COALESCE(SUM(e.value), 0)
         FROM EnergyMonitoringData e
-        WHERE e.field = :field
+        WHERE e.site = :site
+          AND e.field = :field
           AND e.commodityCategory = :category
           AND e.timestamp >= :start
           AND e.timestamp <= :now
         """)
-    double sumPower(@Param("field") String field,
+    double sumPower(@Param("site") String site,
+                    @Param("field") String field,
                     @Param("category") String category,
                     @Param("start") Instant start,
                     @Param("now") Instant now);
 
-    List<EnergyMonitoringData> findAllByTimestampLessThan(Instant todayDate);
-
+    // Derived query: add Site.
+    List<EnergyMonitoringData> findAllBySiteAndTimestampLessThan(
+            String site, Instant todayDate);
 
     @Query("""
-    SELECT COALESCE(SUM(e.value), 0.0)
-    FROM EnergyMonitoringData e
-    WHERE e.timestamp < :timestamp
-      AND e.field = :field
-      AND e.commodityCategory IN :commodityCategories
-    """)
-    double sumValueByTimestampBeforeAndFieldAndCommodityCategoryIn(
+        SELECT COALESCE(SUM(e.value), 0.0)
+        FROM EnergyMonitoringData e
+        WHERE e.site = :site
+          AND e.timestamp < :timestamp
+          AND e.field = :field
+          AND e.commodityCategory IN :commodityCategories
+        """)
+    double sumValueBySiteAndTimestampBeforeAndFieldAndCommodityCategoryIn(
+            @Param("site") String site,
             @Param("timestamp") Instant timestamp,
             @Param("field") String field,
-            @Param("commodityCategories")
-            List<String> commodityCategories
-    );
-
-
+            @Param("commodityCategories") List<String> commodityCategories);
 
     @Query("""
-    SELECT HOUR(e.timestamp) AS hourOfDay,
-           AVG(e.value) AS avgSupplyPower
-    FROM EnergyMonitoringData e
-    WHERE e.field = 'POW'
-      AND e.commodityCategory = 'supply'
-      AND e.timestamp >= :windowStart
-      AND e.timestamp <= :windowEnd
-    GROUP BY HOUR(e.timestamp)
-    ORDER BY hourOfDay
-    """)
-    List<Object[]> avgSupplyByHour(@Param("windowStart") Instant windowStart,
+        SELECT HOUR(e.timestamp) AS hourOfDay,
+               AVG(e.value) AS avgSupplyPower
+        FROM EnergyMonitoringData e
+        WHERE e.site = :site
+          AND e.field = 'POW'
+          AND e.commodityCategory = 'supply'
+          AND e.timestamp >= :windowStart
+          AND e.timestamp <= :windowEnd
+        GROUP BY HOUR(e.timestamp)
+        ORDER BY hourOfDay
+        """)
+    List<Object[]> avgSupplyByHour(@Param("site") String site,
+                                   @Param("windowStart") Instant windowStart,
                                    @Param("windowEnd") Instant windowEnd);
 }

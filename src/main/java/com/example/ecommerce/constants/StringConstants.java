@@ -18,6 +18,11 @@ public class StringConstants {
   public static final String SERVER_ERROR = "Server error";
   public static final String UNEXPECTED_ERROR = "Unexpected server error";
 
+  public static final String RESIDENT = "resident";
+  public static final String COMMUNITY_HOUSING = "resident";
+  public static final String CARPORT= "carport";
+
+
   public static final String ENERGY_DATA = "all energy data";
 
   public static final String CONFLICT = "Conflict";

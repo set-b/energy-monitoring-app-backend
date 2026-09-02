@@ -1,6 +1,5 @@
 package com.example.ecommerce.services;
 
-import com.example.ecommerce.constants.EnergyDataSource;
 import com.example.ecommerce.exceptions.ServiceUnavailable;
 import com.example.ecommerce.models.EnergyMonitoringData;
 import com.example.ecommerce.repositories.EnergyMonitoringRepository;
@@ -16,6 +15,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.example.ecommerce.constants.StringConstants.COMMUNITY_HOUSING;
+import static com.example.ecommerce.constants.StringConstants.RESIDENT;
 
 /**
  * This Class contains methods from the EnergyMonitoringService interface.
@@ -54,7 +56,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
             Instant currentTime = Instant.now();
 
-            return energyMonitoringRepository.findAllByTimestampBetween(startOfDay, currentTime);
+            return energyMonitoringRepository.findAllBySiteAndTimestampBetween(RESIDENT, startOfDay, currentTime);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ServiceUnavailable();
@@ -63,14 +65,13 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
 
 
-    // TODO create string context for consumption or production
     @Override
     public double getTotalConsumptionForToday() {
         Instant now = Instant.now();
         Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
                 .atStartOfDay(ZoneOffset.UTC).toInstant();
 
-        return energyMonitoringRepository.sumPower("POW", "consumption", startOfToday, now);
+        return energyMonitoringRepository.sumPower(RESIDENT,"POW", "consumption", startOfToday, now);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
         Instant startOfToday = now.atZone(ZoneOffset.UTC).toLocalDate()
                 .atStartOfDay(ZoneOffset.UTC).toInstant();
 
-        return energyMonitoringRepository.sumPower("POW", "generation", startOfToday, now);
+        return Math.abs(energyMonitoringRepository.sumPower(RESIDENT,"POW", "generation", startOfToday, now));
     }
 
     private static final int EARLIEST_HOUR = 7;
@@ -90,7 +91,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
         Instant now = Instant.now();
         Instant windowStart = now.minus(60, ChronoUnit.DAYS);
 
-        List<Object[]> rows = energyMonitoringRepository.avgSupplyByHour(windowStart, now);
+        List<Object[]> rows = energyMonitoringRepository.avgSupplyByHour(RESIDENT, windowStart, now);
 
         Map<Integer, Double> avgByHour = new HashMap<>();
         for (Object[] row : rows) {
@@ -136,7 +137,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
      * @return sum of the matching energy values
      */
     private double getTotalByDataSourceAndCommodityCategories(
-            EnergyDataSource dataSource,
+            String dataSource,
             List<String> commodityCategories
     ) {
         Instant currentTime = Instant.now();
@@ -148,7 +149,8 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
         );
 
         return energyMonitoringRepository
-                .sumValueByTimestampBeforeAndFieldAndCommodityCategoryIn(
+                .sumValueBySiteAndTimestampBeforeAndFieldAndCommodityCategoryIn(
+                        dataSource,
                         currentTime,
                         "POW",
                         commodityCategories
@@ -156,7 +158,6 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
     }
 
 
-    //    //TODO this should be for RESIDENT - so we should have something to distinct it from community
 
     /**
      * Returns the resident's total electricity consumption.
@@ -172,13 +173,12 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
     @Override
     public double getTotalConsumptionForResident() {
         return getTotalByDataSourceAndCommodityCategories(
-                EnergyDataSource.RESIDENT,
+                RESIDENT,
                 List.of("consumption")
         );
     }
 
 
-    //    //TODO this should be for RESIDENT - so we should have something to distinct it from community
 
     /**
      *
@@ -192,12 +192,11 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
      */
 
     public double getTotalGenerationForResident() {
-        return -getTotalByDataSourceAndCommodityCategories(
-                EnergyDataSource.RESIDENT,
-                List.of("generation")
+        return Math.abs(getTotalByDataSourceAndCommodityCategories(
+                RESIDENT,
+                List.of("generation"))
         );
     }
-//    //TODO this should be for CommunityHouse - so we should have something to distinct it from resident
 
     /**
      * Calculates the neighborhood's net energy balance.
@@ -213,11 +212,11 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
     public double getDeficitAndSurplusOfTheNeighborhood() {
         double signedNetEnergy =
                 getTotalByDataSourceAndCommodityCategories(
-                        EnergyDataSource.COMMUNITY_HOUSE,
+                        COMMUNITY_HOUSING,
                         List.of("consumption", "generation")
                 );
 
-        return -signedNetEnergy;
+        return -1 * signedNetEnergy;
 
 
 

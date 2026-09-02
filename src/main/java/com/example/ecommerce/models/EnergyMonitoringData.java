@@ -38,10 +38,13 @@ public class EnergyMonitoringData {
     @CsvBindByName(column = "_field")
     private String field;
 
+    @Column(name = "site", nullable = false)
+    private String site;
+
     public EnergyMonitoringData() {
     }
 
-    public EnergyMonitoringData(Long id, Instant timestamp, double value, String commodityType, String commodityCategory, String deviceType, String field) {
+    public EnergyMonitoringData(Long id, Instant timestamp, double value, String commodityType, String commodityCategory, String deviceType, String field, String site) {
         this.id = id;
         this.timestamp = timestamp;
         this.value = value;
@@ -49,6 +52,7 @@ public class EnergyMonitoringData {
         this.commodityCategory = commodityCategory;
         this.deviceType = deviceType;
         this.field = field;
+        this.site = site;
     }
 
     public Long getId() {
@@ -105,5 +109,13 @@ public class EnergyMonitoringData {
 
     public void setField(String field) {
         this.field = field;
+    }
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
     }
 }

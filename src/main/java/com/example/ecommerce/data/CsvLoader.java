@@ -13,6 +13,9 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static com.example.ecommerce.constants.StringConstants.CARPORT;
+import static com.example.ecommerce.constants.StringConstants.RESIDENT;
+
 @Component
 public class CsvLoader {
 
@@ -25,17 +28,26 @@ public class CsvLoader {
     @PostConstruct
     public void load() throws IOException {
         if (energyMonitoringRepository.count() > 0) {
-            System.out.println("Database already populated. Skipping CSV data load.");
+            System.out.println("Database already populated. Skipping.");
             return;
         }
-        ClassPathResource resource = new ClassPathResource("resident_mock.csv");
-        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
 
+        loadFile("resident_mock.csv", RESIDENT);
+        loadFile("carport_mock.csv", CARPORT);
+        // loadFile("community_house_mock.csv", "community_house");  // later
+    }
+
+    private void loadFile(String fileName, String site) throws IOException {
+        ClassPathResource resource = new ClassPathResource(fileName);
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
             List<EnergyMonitoringData> data = new CsvToBeanBuilder<EnergyMonitoringData>(reader)
                     .withType(EnergyMonitoringData.class)
                     .build()
                     .parse();
 
+            for (EnergyMonitoringData row : data) {
+                row.setSite(site);   // tag every row with its origin
+            }
             energyMonitoringRepository.saveAll(data);
         }
     }
