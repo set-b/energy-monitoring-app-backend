@@ -71,7 +71,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
         }
     }
 
-    
+
 
     // TODO create string context for consumption or production
     @Override

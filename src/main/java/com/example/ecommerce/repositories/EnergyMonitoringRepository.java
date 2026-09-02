@@ -30,4 +30,7 @@ public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitori
                     @Param("category") String category,
                     @Param("start") Instant start,
                     @Param("now") Instant now);
+
+    @Query("""
+    """)
 }
