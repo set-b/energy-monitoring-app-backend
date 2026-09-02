@@ -73,8 +73,8 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
     // TODO create string context for consumption or production
     @Override
     public double getTotalConsumptionForToday() {
-        List<EnergyMonitoringData> todaysEnergyData = getEnergyDataForToday();
-        return todaysEnergyData.stream()
+        List<EnergyMonitoringData> todaysEnergyConsumptionData = getEnergyDataForToday();
+        return todaysEnergyConsumptionData.stream()
                 .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("consumption"))
                 .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
                 .sum();
@@ -82,22 +82,43 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
 
     @Override
     public double getTotalProductionForToday() {
-        List<EnergyMonitoringData> todaysEnergyData = getEnergyDataForToday();
-        return todaysEnergyData.stream()
+        List<EnergyMonitoringData> todaysEnergyProductionData = getEnergyDataForToday();
+        return todaysEnergyProductionData.stream()
                 .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("production"))
                 .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
                 .sum();
     }
 
+
+
     @Override
-    public double getTotalProductionForResident() {
-        return 0;
+    public List<EnergyMonitoringData> getCurrentEnergyDataForResident() {
+        try {
+
+            Instant currentTime = Instant.now();
+            return energyMonitoringRepository.findAllByTimestampLessThan(currentTime);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new ServiceUnavailable();
+        }
     }
+
 
     @Override
     public double getTotalConsumptionForResident() {
-        return 0;
-    }
+        List<EnergyMonitoringData> totalEnergyConsumptionDataForResident = getCurrentEnergyDataForResident();
+        return totalEnergyConsumptionDataForResident.stream()
+                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("consumption"))
+                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
+                .sum();    }
+
+    @Override
+    public double getTotalProductionForResident() {
+        List<EnergyMonitoringData> totalEnergyProductionDataForResident = getCurrentEnergyDataForResident();
+        return totalEnergyProductionDataForResident.stream()
+                .filter(f -> f.getField().equals("POW") && f.getCommodityType().equals("production"))
+                .mapToDouble(f -> f.getValue()) // Maps to a Primitive DoubleStream
+                .sum();    }
 
 
 

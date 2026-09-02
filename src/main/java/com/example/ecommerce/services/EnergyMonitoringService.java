@@ -18,6 +18,8 @@ public interface EnergyMonitoringService {
     double getTotalConsumptionForToday();
     double getTotalProductionForToday();
 
+    List<EnergyMonitoringData> getCurrentEnergyDataForResident();
+
     double getTotalProductionForResident();
 
     double getTotalConsumptionForResident();

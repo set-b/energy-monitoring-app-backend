@@ -15,4 +15,5 @@ import java.util.List;
 @Repository
 public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitoringData, Long> {
     List<EnergyMonitoringData> findAllByTimestampBetween(Instant startOfDay, Instant endOfWindow);
+    List<EnergyMonitoringData> findAllByTimestampLessThan( Instant todayDate);
 }

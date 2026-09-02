@@ -78,4 +78,33 @@ public class EnergyMonitoringController {
         return new ResponseEntity<>(energyMonitoringService.getTotalProductionForToday(), HttpStatus.OK);
     }
 
+
+
+
+
+
+    @GetMapping("/resident/consumption/overall")
+    @Operation(summary = "Get Total Energy Consumption Data for resident",
+            description = "Get all energy monitoring data for resident's consumption",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<Double> getResidentTotalConsumption() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalConsumptionForResident(), HttpStatus.OK);
+    }
+
+    @GetMapping("/resident/production/overall")
+    @Operation(summary = "Get Total Energy Production Data for resident",
+            description = "Get all energy monitoring data for resident's production",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<Double> getTotalProductionForResident() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalProductionForResident(), HttpStatus.OK);
+    }
+
 }
