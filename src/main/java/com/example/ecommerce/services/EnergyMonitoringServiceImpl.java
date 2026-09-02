@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.ecommerce.constants.StringConstants.COMMUNITY_HOUSING;
-import static com.example.ecommerce.constants.StringConstants.RESIDENT;
+import static com.example.ecommerce.constants.StringConstants.*;
 
 /**
  * This Class contains methods from the EnergyMonitoringService interface.
@@ -122,6 +121,40 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
         return bestOffset;   // 0..47 realistically; -1 only if no data at all
     }
 
+    @Override
+    public int getNextBestTimeHoursCarport() {
+        Instant now = Instant.now();
+        Instant windowStart = now.minus(60, ChronoUnit.DAYS);
+
+        List<Object[]> rows = energyMonitoringRepository.avgSupplyByHour(CARPORT, windowStart, now);
+
+        Map<Integer, Double> avgByHour = new HashMap<>();
+        for (Object[] row : rows) {
+            int hour = ((Number) row[0]).intValue();
+            double avgSupply = ((Number) row[1]).doubleValue();
+            avgByHour.put(hour, avgSupply);
+        }
+
+        int currentHour = now.atZone(ZoneOffset.UTC).getHour();
+
+        int bestOffset = -1;
+        double bestSupply = Double.POSITIVE_INFINITY;   // most negative = most surplus
+
+        for (int offset = 0; offset < 24; offset++) {
+            int hour = (currentHour + offset) % 24;
+            if (hour < EARLIEST_HOUR || hour > LATEST_HOUR) continue;
+
+            Double avg = avgByHour.get(hour);
+            if (avg == null) continue;
+
+            if (avg < bestSupply) {
+                bestSupply = avg;
+                bestOffset = offset;
+            }
+        }
+
+        return bestOffset;
+    }
 
 
 

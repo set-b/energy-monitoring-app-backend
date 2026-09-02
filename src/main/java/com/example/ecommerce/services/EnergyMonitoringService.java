@@ -21,6 +21,8 @@ public interface EnergyMonitoringService {
     double getTotalGenerationForResident();
     int getNextBestTimeHours();
 
+    int getNextBestTimeHoursCarport();
+
     double getTotalConsumptionForResident();
 
     double getDeficitAndSurplusOfTheNeighborhood();
