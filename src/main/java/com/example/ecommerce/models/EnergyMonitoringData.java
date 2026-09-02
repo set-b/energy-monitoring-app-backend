@@ -1,5 +1,7 @@
 package com.example.ecommerce.models;
 
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvDate;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -11,42 +13,39 @@ public class EnergyMonitoringData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // timestamp
-    @Column(nullable = false)
+    // TODO convert to instant
+    @CsvDate("yyyy-MM-dd HH:mm:ssXXX")
+    @CsvBindByName(column = "_time")
+    @Column(name = "time", nullable =false)
     private Instant timestamp;
 
-    // TODO combine _value and _field into an Embeddable
-    // private Measurement measurement
+    @CsvBindByName(column = "_value")
+    @Column(name = "reading_value", nullable = false)
+    private double value;
 
-    // CTYPE
-    @Column(nullable = false)
+    @CsvBindByName(column = "CTYPE")
     private String commodityType;
 
-    // CTYPEC
-    @Column(nullable = true)
+    @CsvBindByName(column = "CTYPEC")
     private String commodityCategory;
 
-    // ETYPE - priceprovider is the only value that is NOT a DEVICE
-    @Column(nullable = false)
+    @CsvBindByName(column = "ETYPE")
     private String deviceType;
 
-    // Lob = "large object"
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String content;
-
-    // getters/setters
+    @CsvBindByName(column = "_field")
+    private String field;
 
     public EnergyMonitoringData() {
     }
 
-    public EnergyMonitoringData(Long id, Instant timestamp, String commodityType, String commodityCategory, String deviceType, String content) {
+    public EnergyMonitoringData(Long id, Instant timestamp, double value, String commodityType, String commodityCategory, String deviceType, String field) {
         this.id = id;
         this.timestamp = timestamp;
+        this.value = value;
         this.commodityType = commodityType;
         this.commodityCategory = commodityCategory;
         this.deviceType = deviceType;
-        this.content = content;
+        this.field = field;
     }
 
     public Long getId() {
@@ -63,6 +62,14 @@ public class EnergyMonitoringData {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 
     public String getCommodityType() {
@@ -89,11 +96,11 @@ public class EnergyMonitoringData {
         this.deviceType = deviceType;
     }
 
-    public String getContent() {
-        return content;
+    public String getField() {
+        return field;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setField(String field) {
+        this.field = field;
     }
 }

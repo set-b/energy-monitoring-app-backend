@@ -32,10 +32,10 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
     @Override
     public String getAllEnergyData() {
         try {
-            String data = energyMonitoringRepository.findAll().stream().map(
-                    m -> m.getContent()
-            ).collect(Collectors.joining());
-            return data;
+//            String data = energyMonitoringRepository.findAll().stream().map(
+////                    m -> m.getContent()
+//            ).collect(Collectors.joining());
+            return null;
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ServiceUnavailable(); // change error later to relevant TODO
