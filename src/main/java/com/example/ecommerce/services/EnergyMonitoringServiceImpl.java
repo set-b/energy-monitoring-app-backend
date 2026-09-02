@@ -1,12 +1,11 @@
 package com.example.ecommerce.services;
 
 import com.example.ecommerce.exceptions.ServiceUnavailable;
-import com.example.ecommerce.models.Customer;
+import com.example.ecommerce.models.EnergyMonitoringData;
 import com.example.ecommerce.repositories.EnergyMonitoringRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -30,12 +29,9 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
      * @return String
      */
     @Override
-    public String getAllEnergyData() {
+    public List<EnergyMonitoringData> getAllEnergyData() {
         try {
-//            String data = energyMonitoringRepository.findAll().stream().map(
-////                    m -> m.getContent()
-//            ).collect(Collectors.joining());
-            return null;
+            return energyMonitoringRepository.findAll();
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ServiceUnavailable(); // change error later to relevant TODO

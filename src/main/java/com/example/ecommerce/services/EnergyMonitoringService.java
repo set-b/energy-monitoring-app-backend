@@ -1,5 +1,9 @@
 package com.example.ecommerce.services;
 
+import com.example.ecommerce.models.EnergyMonitoringData;
+
+import java.util.List;
+
 // TODO change from String to entity and perhaps entity properties
 public interface EnergyMonitoringService {
 
@@ -7,5 +11,5 @@ public interface EnergyMonitoringService {
      * This function takes CSV data and returns all of it as a String
      * @return String
      */
-    String getAllEnergyData();
+    List<EnergyMonitoringData> getAllEnergyData();
 }

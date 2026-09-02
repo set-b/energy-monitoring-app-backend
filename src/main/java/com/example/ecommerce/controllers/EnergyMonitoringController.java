@@ -1,5 +1,6 @@
 package com.example.ecommerce.controllers;
 
+import com.example.ecommerce.models.EnergyMonitoringData;
 import com.example.ecommerce.services.EnergyMonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.example.ecommerce.constants.StringConstants.*;
 
@@ -36,7 +38,7 @@ public class EnergyMonitoringController {
                     @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
             })
     // TODO create an entity representing the columns of the CSV file
-    public ResponseEntity<String> getResidentCSVData() {
+    public ResponseEntity<List<EnergyMonitoringData>> getResidentCSVData() {
         logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
 
         return new ResponseEntity<>(energyMonitoringService.getAllEnergyData(), HttpStatus.OK);
