@@ -1,6 +1,5 @@
 package com.example.ecommerce.repositories;
 
-import com.example.ecommerce.models.Customer;
 import com.example.ecommerce.models.EnergyMonitoringData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
