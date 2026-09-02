@@ -64,4 +64,21 @@ public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitori
     List<Object[]> avgSupplyByHour(@Param("site") String site,
                                    @Param("windowStart") Instant windowStart,
                                    @Param("windowEnd") Instant windowEnd);
+
+    @Query("""
+    SELECT COALESCE(MAX(e.value), 0) - COALESCE(MIN(e.value), 0)
+    FROM EnergyMonitoringData e
+    WHERE e.site = :site
+      AND e.deviceType = :device
+      AND e.field = :counterField
+      AND e.commodityCategory = :category
+      AND e.timestamp >= :monthStart
+      AND e.timestamp <= :monthEnd
+    """)
+    double counterDelta(@Param("site") String site,
+                        @Param("device") String device,
+                        @Param("counterField") String counterField,
+                        @Param("category") String category,
+                        @Param("monthStart") Instant monthStart,
+                        @Param("monthEnd") Instant monthEnd);
 }

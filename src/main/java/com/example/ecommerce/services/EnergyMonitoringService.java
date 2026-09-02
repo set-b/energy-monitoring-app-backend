@@ -26,4 +26,9 @@ public interface EnergyMonitoringService {
     double getTotalConsumptionForResident();
 
     double getDeficitAndSurplusOfTheNeighborhood();
+
+    double getEnergySavedLastMonth(String site);
+
+    double getMoneySavedLastMonth(String site);
+
 }

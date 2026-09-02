@@ -27,6 +27,8 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
     private final Logger logger = LoggerFactory.getLogger(EnergyMonitoringService.class);
 
+    private static final double PRICE = 0.254084;
+
     @Autowired
     private EnergyMonitoringRepository energyMonitoringRepository;
 
@@ -253,6 +255,25 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
 
 
+    }
+
+    @Override
+    public double getEnergySavedLastMonth(String site) {
+        Instant now = Instant.now();
+        Instant monthStart = now.minus(30, ChronoUnit.DAYS);
+
+        double generation = energyMonitoringRepository.counterDelta(
+                site, "solarpanel", "ENE_CNT_EXP", "generation", monthStart, now);
+        double gridExport = energyMonitoringRepository.counterDelta(
+                site, "powermeter", "ENE_CNT_EXP", "supply", monthStart, now);
+
+        double selfConsumed = generation - gridExport;
+        return Math.max(selfConsumed, 0);   // kWh
+    }
+
+    @Override
+    public double getMoneySavedLastMonth(String site) {
+        return getEnergySavedLastMonth(site) * PRICE;   // € = kWh × price
     }
 
 }

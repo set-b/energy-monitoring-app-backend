@@ -145,4 +145,26 @@ public class EnergyMonitoringController {
         return new ResponseEntity<>(energyMonitoringService.getDeficitAndSurplusOfTheNeighborhood(), HttpStatus.OK);
     }
 
+    @GetMapping("/savings/energy")
+    @Operation(summary = "returns the power amount of energy savings this month",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "from last reading surplus/deficit in energy production - neighborhood")
+            })
+    public ResponseEntity<Double> getEnergySavings() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getEnergySavedLastMonth(RESIDENT), HttpStatus.OK);
+    }
+
+    @GetMapping("/savings/money")
+    @Operation(summary = "returns the euro amount of energy savings this month",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "from last reading surplus/deficit in energy production - neighborhood")
+            })
+    public ResponseEntity<Double> getEuroSavings() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getMoneySavedLastMonth(RESIDENT), HttpStatus.OK);
+    }
+
 }
