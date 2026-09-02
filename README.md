@@ -1,112 +1,122 @@
-# Ecommerce REST API
+# Energy Saver App — Backend
 
-## Description
-
-This application is intended to demonstrate competency and developmental understanding in the areas
-of data access, Java Spring Boot, REST API principles, and CRUD functionality. The application
-allows users to send requests for all CRUD functions in order to manipulate the data of Customer,
-User, Product, and Order models.
+Spring Boot backend that loads a year of energy-monitoring data (per site) into an H2 database and exposes calculations like today's generation/consumption, energy and money saved, and the next best time to use energy or charge a car.
 
 ## Prerequisites
 
-The instructions detailed hereafter assume that the user is using the IDE IntelliJ IDEA, and the
-ensuing steps may not be applicable if the user is using another development environment, tool kit,
-or editor. First, start up IntelliJ and open the root folder of the application (file -> open ->
-rest-greeting). You may also access this application directory through the command line if the path
-environment variable has been enabled on your operating system. Command line shortcuts for opening
-the application may be found in this link: (<https://tinyurl.com/mr4d3ub4>).
+- **Java 17+** and Maven (the project uses the Maven wrapper `mvnw`, so a separate Maven install isn't required)
+- **Python 3** (only to generate the mock CSV data — no Python packages needed, standard library only)
 
-After opening the application directory in IntelliJ, select "EcommerceApplication" from the drop-
-down menu on the configuration pane. The pane can be found near the top of the IDE, on the toolbar.
-Press the play button to launch the Spring Boot Application. The Tomcat server will start on port
-"8080" by default.
+## First-time setup
 
-After the application has been started successfully, you may also import the postman collection link
-into Postman via the web or desktop application to manually test requests. Swagger-UI may also be
-used in order to manually test the API's endpoints. You can find these links in under the links
-section.
+The app needs two large CSV files that are **not** stored in Git (they're ~200–250 MB each). You generate them locally from the committed script. This only has to be done once.
 
-## Viewing the database
+### 1. Generate the mock data
 
-The application is currently configured to use a local in-memory H2 database for the purposes of quick local testing and demonstration.
+The generator script lives in `src/main/resources/`. From the project root:
 
-The original data source provider for this application is MySQL. If you wish to run the application connected to a MySQL database instead of a local in-memory database, uncomment the lines for the MySQL database in the YAML file, and input your MySQL credentials, including the username and password fields, as well as the url of your database host. Ensure that the the H2 configurations are also commented out or removed prior to starting the application. You may also use the
-command line, or start the MySQL Workbench UI to view the Customer, Order, User, Product, and Item entities.
+```bash
+cd src/main/resources
+python generate_mock_data.py
+cd ../../..
+```
 
-## Overview of Classes
+This writes two files next to the script:
 
-All classes have been separated on the basis of concerns via packages, with the exception of the
-application runner, EcommerceApplication. Below you will find an overview of the packages and
-classes in the project structure.
+- `src/main/resources/resident_mock.csv`
+- `src/main/resources/carport_mock.csv`
 
-### Config
+It takes a couple of minutes per file. The output is reproducible (the random seed is fixed), so everyone gets identical files.
 
-This contains configurations for swagger documentation and springfox swagger ui. It will also
-contain security configurations in the future.
+> If `python` isn't found, try `python3`. The script needs no dependencies.
 
-### Constants
+### 2. (If needed) Remove a stale database file
 
-This contains all the string messages of errors and endpoints to preserve maintainability across the
-application. These are located in the StringConstants class.
+The app stores its H2 database on disk at `data/testdb.mv.db`. On a **clean checkout this won't exist yet** — skip this step. You only need it if:
 
-### Controllers
+- You changed the entity/schema and are getting DDL or column errors on startup, **or**
+- You get a database file-lock error (`90028`, "unable to obtain isolated JDBC connection"), **or**
+- The data looks wrong/partial and you want a clean reload.
 
-This contains the CustomerController, OrderController, ProductController, and UserController
-classes, which take methods from their respective ServiceImpl classes (i.e. CustomerServiceImpl)
-via autowiring to the service interfaces. It is mapped to basic CRUD functionality
-of the common HTTP verbs, GET, PUT, POST, and DELETE. Endpoints have been written to create a
-uniform
-identification of resources.
+To force a clean rebuild, stop the app and delete the database file:
 
-### Data
+```bash
+# from the project root
+# Windows (PowerShell):
+del data\testdb.mv.db
+# macOS / Linux:
+rm data/testdb.mv.db
+```
 
-This contains the DataLoader class, used to load the all Objects once the application is
-launched.
+On the next start, the app recreates the database and reloads the CSVs from scratch.
 
-### Exceptions
+> The database rebuilds itself from the CSVs, so deleting it is always safe — you never lose anything that isn't regenerated.
 
-This package contains all custom exception classes used throughout the application, as well as the
-Exception Controller, which is used as an exception handler with a global scope. Most of these
-exceptions have been incorporated into the logic of the service implementation classes.
+### 3. Run the app
 
-### Models
+From the project root:
 
-This package contains the constructors and properties of the Customer, Order, Item, Product, and
-User
-models, as well as the Address embeddable.
+```bash
+# Windows:
+mvnw.cmd spring-boot:run
+# macOS / Linux:
+./mvnw spring-boot:run
+```
 
-### Repositories
+**The first startup is slow.** It parses several million CSV rows and inserts them into H2 — expect a few minutes. Watch the console for `Loading resident_mock.csv ...` / `Finished ...` messages.
 
-This package contains the Customer, Order, Product, User, and Item Repositories, which extend the
-JpaRepository to access a library of methods to manipulate stored Objects via CRUD operations.
+**Every startup after that is fast.** The loader checks whether the database already has data and skips reloading if so. You'll see:
 
-### Services
+```
+Database already populated. Skipping CSV data load.
+```
 
-This package contains the interfaces for all services, Customer, Order, Product, and User, which are
-implemented accordingly in the ServiceImpl classes. 
+That message on the second run means everything worked.
 
-### Test Packages
+## Verifying it worked
 
-This package contains integration and unit tests for the Controllers and ServiceImpl classes, 
-respectively.
+Once running, open the H2 console at:
 
-In order to run these tests, select the configuration file containing the name of the class you wish
-test and press the play button. Each testing method also has play buttons to test on the
-method-level,
-as well. Right-clicking the class itself will present alternative testing options through a tool
-tip.
-You can run tests with coverage as an option, for example. Current testing line coverage is 100% for
-both classes.
+```
+http://localhost:8080/h2-console
+```
 
-### Linting
+Connect with:
 
-The code can be linted through the shortcut Ctrl+Alt+L, or you can right-click the directory or file
-containing the code you wish to reformat, and select "Reformat Code". This can be used to lint and
-optimize the imports of subdirectories, as well.
+- **JDBC URL:** `jdbc:h2:file:./data/testdb`
+- **User Name:** `sa`
+- **Password:** *(leave blank)*
 
-### Helpful Links
+> The JDBC URL must match exactly. If you connect to `jdbc:h2:mem:testdb` instead, you'll open a different, empty database and see no data.
 
-Swagger UI: <http://localhost:8080/swagger-ui/index.html>
+A quick sanity check:
 
-Github: <https://github.com/set-b>
+```sql
+SELECT COUNT(*) FROM energy_monitoring_data;
+SELECT site, COUNT(*) FROM energy_monitoring_data GROUP BY site;
+```
 
+You should see millions of rows, split across the sites (`resident`, `carport`).
+
+## Common problems
+
+**`create table ... [*]value ...` DDL error on startup**
+A reserved-word column clash. If it recurs after a schema change, delete `data/testdb.mv.db` and restart to rebuild cleanly.
+
+**`90028` / "unable to obtain isolated JDBC connection"**
+Something already has the database file open — usually a previous run that didn't shut down cleanly, or a standalone H2 console. Stop all running instances of the app, close any external H2 console, then restart. If it persists, delete `data/testdb.mv.db`.
+
+**`Invalid character found in method name [0x16 0x03 0x01 ...]`**
+A client sent an HTTPS request to the plain-HTTP server. Use `http://localhost:8080`, not `https://`. This is a client URL issue, not a server bug — the app keeps running.
+
+**Endpoints return `0.0` for "today"**
+The mock data is for the year **2026**. Make sure the CSVs actually loaded (check the row count above) and that any date-based query is comparing in **UTC** (the timestamps are stored as UTC).
+
+**Queries are slow**
+Confirm the composite index on `(site, field, commodity_category, time)` exists — without it, aggregate queries scan the whole table. Check in the H2 console under the table's indexes, or via `INFORMATION_SCHEMA`.
+
+## Notes
+
+- **Data is synthetic.** The mock CSVs are physically-plausible (seasonal solar, daily load curves) but generated, not measured. They're for development and exercising the calculations, not real readings.
+- **Don't commit the CSVs or the database.** `.gitignore` excludes `*_mock.csv`, `data/`, and `*.mv.db`. Only the generator script is committed. If you ever see a huge file staged for commit, stop — it shouldn't be tracked.
+- **Sites** are distinguished by a `site` column on each row, set by the loader per file (`resident`, `carport`). Queries filter by site to keep the data separate.
