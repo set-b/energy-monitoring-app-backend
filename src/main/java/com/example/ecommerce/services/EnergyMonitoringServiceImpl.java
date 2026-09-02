@@ -132,6 +132,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
     /**
      * Returns the resident's total electricity consumption.
+     *
      * @return total consumption as a positive value
      * NOTEBOOK INFORMATION ->
      * consumption today X
@@ -167,7 +168,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
                 EnergyDataSource.RESIDENT,
                 List.of("generation")
         );
-
+    }
 //    //TODO this should be for CommunityHouse - so we should have something to distinct it from resident
 
     /**
@@ -190,7 +191,9 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
         return -signedNetEnergy;
 
-    /*--------------------------------------------------------------------------------------------------------*/
+        /*--------------------------------------------------------------------------------------------------------*/
 
+
+    }
 
 }
