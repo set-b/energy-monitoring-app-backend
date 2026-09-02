@@ -18,9 +18,14 @@ public interface EnergyMonitoringService {
     double getTotalConsumptionForToday();
     double getTotalProductionForToday();
 
+//    List<EnergyMonitoringData> getCurrentEnergyDataForResident();
+
+    double getTotalGenerationForResident();
     int getNextBestTimeHours();
 
     double getTotalProductionForResident();
 
     double getTotalConsumptionForResident();
+
+    double getDeficitAndSurplusOfTheNeighborhood();
 }

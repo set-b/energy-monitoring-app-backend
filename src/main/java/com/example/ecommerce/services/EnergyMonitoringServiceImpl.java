@@ -1,5 +1,6 @@
 package com.example.ecommerce.services;
 
+import com.example.ecommerce.constants.EnergyDataSource;
 import com.example.ecommerce.exceptions.ServiceUnavailable;
 import com.example.ecommerce.models.EnergyMonitoringData;
 import com.example.ecommerce.repositories.EnergyMonitoringRepository;
@@ -21,7 +22,7 @@ import java.util.Map;
  * This is used to process and return CSV data
  */
 @Service
-public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
+public class EnergyMonitoringServiceImpl implements EnergyMonitoringService {
 
     private final Logger logger = LoggerFactory.getLogger(EnergyMonitoringService.class);
 
@@ -30,6 +31,7 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
 
     /**
      * This method returns all CSV data, unprocessed
+     *
      * @return String
      */
     @Override
@@ -52,8 +54,8 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
 
             Instant currentTime = Instant.now();
 
-             return energyMonitoringRepository.findAllByTimestampBetween(startOfDay, currentTime);
-        } catch (Exception e){
+            return energyMonitoringRepository.findAllByTimestampBetween(startOfDay, currentTime);
+        } catch (Exception e) {
             logger.error(e.getMessage());
             throw new ServiceUnavailable();
         }
@@ -119,13 +121,108 @@ public class EnergyMonitoringServiceImpl implements EnergyMonitoringService{
         return bestOffset;   // 0..47 realistically; -1 only if no data at all
     }
 
-    @Override
-    public double getTotalProductionForResident() {
-        return 0;
+
+
+    /*--------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * Calculates the total value for the requested data source and commodity categories.
+     * <p>
+     * The dataSource parameter is currently a placeholder that documents whether the
+     * calculation belongs to resident or community-house data. It must be added to
+     * the repository query when a data-source column is available in the entity.
+     *
+     * @param dataSource          data source used by the calculation
+     * @param commodityCategories categories included in the calculation
+     * @return sum of the matching energy values
+     */
+    private double getTotalByDataSourceAndCommodityCategories(
+            EnergyDataSource dataSource,
+            List<String> commodityCategories
+    ) {
+        Instant currentTime = Instant.now();
+
+        logger.debug(
+                "Calculating energy total for data source {} and categories {}",
+                dataSource,
+                commodityCategories
+        );
+
+        return energyMonitoringRepository
+                .sumValueByTimestampBeforeAndFieldAndCommodityCategoryIn(
+                        currentTime,
+                        "POW",
+                        commodityCategories
+                );
     }
 
+
+    //    //TODO this should be for RESIDENT - so we should have something to distinct it from community
+
+    /**
+     * Returns the resident's total electricity consumption.
+     *
+     * @return total consumption as a positive value
+     * NOTEBOOK INFORMATION ->
+     * consumption today X
+     * - get all rows with same instant with today's date and time equal to or less than the current time
+     * - if CTYPEC == consumption then add up the _value fields  (test)
+     * <p>
+     * create mock data for this
+     */
     @Override
     public double getTotalConsumptionForResident() {
-    return 0;
+        return getTotalByDataSourceAndCommodityCategories(
+                EnergyDataSource.RESIDENT,
+                List.of("consumption")
+        );
     }
+
+
+    //    //TODO this should be for RESIDENT - so we should have something to distinct it from community
+
+    /**
+     *
+     * Returns the resident's total electricity generation.
+     *
+     * @return total generation as stored in the dataset, usually negative
+     * NOTEBOOK INFORMATION ->
+     * - get all rows with same instant with today's date and time equal to or less than the current time
+     * - conditional to call helper function
+     * - if CTYPEC == generation then add up the _value fields
+     */
+
+    public double getTotalGenerationForResident() {
+        return -getTotalByDataSourceAndCommodityCategories(
+                EnergyDataSource.RESIDENT,
+                List.of("generation")
+        );
+    }
+//    //TODO this should be for CommunityHouse - so we should have something to distinct it from resident
+
+    /**
+     * Calculates the neighborhood's net energy balance.
+     * <p>
+     * Generation values are stored as negative numbers and consumption values as
+     * positive numbers. The signed total is negated so that a positive result
+     * represents a surplus and a negative result represents a deficit.
+     *
+     * @return positive for surplus, negative for deficit, or zero when balanced
+     * NOTEBOOK INFORMATION ->
+     * -- from last reading surplus/deficit in energy production - neighborhood (this from notebook)
+     */
+    public double getDeficitAndSurplusOfTheNeighborhood() {
+        double signedNetEnergy =
+                getTotalByDataSourceAndCommodityCategories(
+                        EnergyDataSource.COMMUNITY_HOUSE,
+                        List.of("consumption", "generation")
+                );
+
+        return -signedNetEnergy;
+
+        /*--------------------------------------------------------------------------------------------------------*/
+
+
+    }
+
 }

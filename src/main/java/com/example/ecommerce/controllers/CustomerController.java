@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Customer Controller", description = "Customer management API")
 @RestController
 @RequestMapping(CONTEXT_CUSTOMERS)
+
 public class CustomerController {
 
   private final Logger logger = LoggerFactory.getLogger(CustomerController.class);

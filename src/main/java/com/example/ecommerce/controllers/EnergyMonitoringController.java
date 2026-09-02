@@ -90,4 +90,47 @@ public class EnergyMonitoringController {
         return new ResponseEntity<>(energyMonitoringService.getNextBestTimeHours(), HttpStatus.OK);
     }
 
+
+
+
+
+
+    @GetMapping("/resident/consumption/overall")
+    @Operation(summary = "Get Total Energy Consumption Data for resident",
+            description = "Get all energy monitoring data for resident's consumption",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Total Energy consumption data")
+            })
+    public ResponseEntity<Double> getResidentTotalConsumption() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalConsumptionForResident(), HttpStatus.OK);
+    }
+
+    @GetMapping("/resident/production/overall")
+    @Operation(summary = "Get Total Energy Production Data for resident",
+            description = "Get all energy monitoring data for resident's production",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Total Energy production data ")
+            })
+    public ResponseEntity<Double> getTotalGenerationForResident() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalGenerationForResident(), HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("/neighborhood/subtract/overall")
+    @Operation(summary = "Subtract production and consumption Data for neighborhood",
+            description = "Subtract data for the neighborhood ",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "from last reading surplus/deficit in energy production - neighborhood")
+            })
+    public ResponseEntity<Double> getDeficitAndSurplusOfTheNeighborhood() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getDeficitAndSurplusOfTheNeighborhood(), HttpStatus.OK);
+    }
+
 }

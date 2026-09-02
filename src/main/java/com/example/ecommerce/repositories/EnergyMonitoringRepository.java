@@ -30,6 +30,25 @@ public interface EnergyMonitoringRepository extends JpaRepository<EnergyMonitori
                     @Param("start") Instant start,
                     @Param("now") Instant now);
 
+    List<EnergyMonitoringData> findAllByTimestampLessThan(Instant todayDate);
+
+
+    @Query("""
+    SELECT COALESCE(SUM(e.value), 0.0)
+    FROM EnergyMonitoringData e
+    WHERE e.timestamp < :timestamp
+      AND e.field = :field
+      AND e.commodityCategory IN :commodityCategories
+    """)
+    double sumValueByTimestampBeforeAndFieldAndCommodityCategoryIn(
+            @Param("timestamp") Instant timestamp,
+            @Param("field") String field,
+            @Param("commodityCategories")
+            List<String> commodityCategories
+    );
+
+
+
     @Query("""
     SELECT HOUR(e.timestamp) AS hourOfDay,
            AVG(e.value) AS avgSupplyPower
