@@ -12,4 +12,13 @@ public interface EnergyMonitoringService {
      * @return String
      */
     List<EnergyMonitoringData> getAllEnergyData();
+
+    List<EnergyMonitoringData> getEnergyDataForToday();
+
+    double getTotalConsumptionForToday();
+    double getTotalProductionForToday();
+
+    double getTotalProductionForResident();
+
+    double getTotalConsumptionForResident();
 }

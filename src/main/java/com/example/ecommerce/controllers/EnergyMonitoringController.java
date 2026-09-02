@@ -30,18 +30,52 @@ public class EnergyMonitoringController {
         this.energyMonitoringService = energyMonitoringService;
     }
 
-    // TODO returns all CSV data
     @GetMapping
     @Operation(summary = "Query Energy Data",
             description = "Get all energy monitoring data",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
             })
-    // TODO create an entity representing the columns of the CSV file
     public ResponseEntity<List<EnergyMonitoringData>> getResidentCSVData() {
         logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
 
         return new ResponseEntity<>(energyMonitoringService.getAllEnergyData(), HttpStatus.OK);
+    }
+
+    @GetMapping("/today")
+    @Operation(summary = "Get Energy Data for today",
+            description = "Get all energy monitoring data for today",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<List<EnergyMonitoringData>> getResidentCSVDataForToday() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getEnergyDataForToday(), HttpStatus.OK);
+    }
+
+    @GetMapping("/today/consumption")
+    @Operation(summary = "Get Total Energy Consumption Data for today",
+            description = "Get all energy monitoring data for today's consumption",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<Double> getResidentTotalConsumptionForToday() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalConsumptionForToday(), HttpStatus.OK);
+    }
+
+    @GetMapping("/today/production")
+    @Operation(summary = "Get Total Energy Production Data for today",
+            description = "Get all energy monitoring data for today's production",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Energy monitoring data csv")
+            })
+    public ResponseEntity<Double> getResidentTotalProductionForToday() {
+        logger.info(new Date() + GET_REQUEST_ENERGY + ENERGY_DATA);
+
+        return new ResponseEntity<>(energyMonitoringService.getTotalProductionForToday(), HttpStatus.OK);
     }
 
 }
