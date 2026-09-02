@@ -177,11 +177,4 @@ public class DataLoader implements CommandLineRunner {
         new User("Michael Scott", "Boss", new String[]{ADMIN}, "mscott@ecommerce.com",
             "supersecretpassword1!"));
   }
-
-//  /**
-//   * this loads the CSV file to the EnergyMonitoringRepository to be saved in the database
-//   */
-//  private void loadEnergyMonitoringData() {
-//      data = EnergyMonitoringRepository
-//  }
 }
