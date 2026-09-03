@@ -9,7 +9,7 @@ import java.time.Instant;
 // TODO delete CSV content column!!
 @Entity
 @Table(indexes = {
-        @Index(name = "idx_query", columnList = "time,reading_value,commodity_type,commodity_category,device_type,field")
+        @Index(name = "idx_query", columnList = "site,field,commodity_category,time")
 })
 public class EnergyMonitoringData {
     @Id
